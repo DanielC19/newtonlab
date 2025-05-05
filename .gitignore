@@ -1,0 +1,43 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.pyo
+*.pyd
+*.pyc
+
+# Django-specific
+*.log
+local_settings.py
+db.sqlite3
+media/
+static/img/numerical_method/
+
+# Environments
+.env
+*.env
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+*.orig
+*.back
+*.rej
+*.swo
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db

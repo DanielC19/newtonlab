@@ -1,0 +1,6 @@
+dependency_injector
+Django
+matplotlib
+numpy
+sympy
+scipy
