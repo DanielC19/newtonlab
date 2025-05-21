@@ -1,0 +1,15 @@
+* {
+    font-family: "Manrope", sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+:root {
+    accent-color: #db3f59;
+}
+
+.navbar {
+    background-color: #db3f59;
+}

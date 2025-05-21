@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/layouts/app.css' %}" />
+    {% block extra_css %}
+
+    {% endblock %}
+    <title>
+      {% block title %}
+        NewtonLab
+      {% endblock %}
+    </title>
+  </head>
+
+  <body>
+    <header>
+      <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="{% url 'home:index' %}"><img src="{% static 'img/logo.png' %}" width="250" class="d-inline-block align-top" alt="" /></a>
+      </nav>
+    </header>
+
+    <main class="mt-4 mx-5">
+      {% block content %}
+
+      {% endblock %}
+    </main>
+
+    <footer class="bg-body-tertiary text-center text-md-start bg-light mt-5 p-5">
+      <div class="text-center p-2">
+        <img src="{% static 'img/logo.png' %}" width="300" class="d-inline-block align-top" alt="" />
+      </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
