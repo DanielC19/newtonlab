@@ -51,12 +51,21 @@ class GaussSeidelService(MatrixMethod):
                 x1_rounded = [float(f"{value:.{significant_digits}g}") for value in x1]
                 error_rounded = float(f"{current_error:.{significant_digits}g}")
 
-            # Guardamos la información de la iteración actual
-            table[current_iteration + 1] = {
-                "iteration": current_iteration + 1,
-                "X": x1_rounded,
-                "Error": error_rounded,
-            }
+            # Guardar la fila SOLO si current_error > tolerance o si es la última iteración
+            if current_error > tolerance or current_iteration + 1 == max_iterations:
+                table[current_iteration + 1] = {
+                    "iteration": current_iteration + 1,
+                    "X": x1_rounded,
+                    "Error": error_rounded,
+                }
+            else:
+                # Si ya converge, guarda la fila final con ese error y termina el ciclo
+                table[current_iteration + 1] = {
+                    "iteration": current_iteration + 1,
+                    "X": x1_rounded,
+                    "Error": error_rounded,
+                }
+                break
 
             # Preparación para la siguiente iteración
             x0 = x1.copy()
@@ -70,16 +79,16 @@ class GaussSeidelService(MatrixMethod):
                 "table": table,
                 "is_successful": True,
                 "have_solution": True,
-                "solution": x1_rounded,
+                "solution": [float(x) for x in x1_rounded],
                 "spectral_radius": spectral_radius,
             }
         elif current_iteration >= max_iterations:
             result = {
-                "message_method": f"El método funcionó correctamente, pero no se encontró una solución en {max_iterations} iteraciones y el radio espectral es de = {spectral_radius}.",
+                "message_method": f"El método llegó al máximo de iteraciones ({max_iterations}) y el radio espectral es de = {spectral_radius}. Se muestra la mejor aproximación encontrada.",
                 "table": table,
                 "is_successful": True,
-                "have_solution": False,
-                "solution": x1_rounded,
+                "have_solution": True if table else False,
+                "solution": [float(x) for x in x1_rounded] if table else [],
                 "spectral_radius": spectral_radius,
             }
         else:
@@ -91,7 +100,7 @@ class GaussSeidelService(MatrixMethod):
                 "solution": [],
             }
 
-        # Si la matriz es 2x2, generar las gráficas
+        # Generar gráficas si la matriz es 2x2 (independientemente de convergencia)
         if len(A) == 2:
             plot_matrix_solution(table, x1_rounded, spectral_radius)
             plot_system_equations(A.tolist(), b.tolist(), x1_rounded)

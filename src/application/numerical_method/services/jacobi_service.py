@@ -48,12 +48,20 @@ class JacobiService(MatrixMethod):
             formatted_x1 = self.apply_precision(x1.tolist(), precision_type, tolerance)
             formatted_error = self.apply_precision([current_error], precision_type, tolerance)[0]
 
-            # Guardamos la información de la iteración actual
-            table[current_iteration + 1] = {
-                "iteration": current_iteration + 1,
-                "X": formatted_x1,
-                "Error": formatted_error,
-            }
+            # Guardar la fila SOLO si current_error > tolerance o si es la última iteración
+            if current_error > tolerance or current_iteration + 1 == max_iterations:
+                table[current_iteration + 1] = {
+                    "iteration": current_iteration + 1,
+                    "X": formatted_x1,
+                    "Error": formatted_error,
+                }
+            else:
+                table[current_iteration + 1] = {
+                    "iteration": current_iteration + 1,
+                    "X": formatted_x1,
+                    "Error": formatted_error,
+                }
+                break
 
             # Preparación para la siguiente iteración
             x0 = x1.copy()
@@ -67,16 +75,17 @@ class JacobiService(MatrixMethod):
                 "table": table,
                 "is_successful": True,
                 "have_solution": True,
-                "solution": formatted_x1,
+                "solution": [float(x) for x in formatted_x1],
                 "spectral_radius": spectral_radius,
             }
         elif current_iteration >= max_iterations:
+            # Si hay datos en la tabla, igual muestra la última aproximación como solución
             result = {
-                "message_method": f"El método funcionó correctamente, pero no se encontró una solución en {max_iterations} iteraciones y el radio espectral es de = {spectral_radius}.",
+                "message_method": f"El método llegó al máximo de iteraciones ({max_iterations}) y el radio espectral es de = {spectral_radius}. Se muestra la mejor aproximación encontrada.",
                 "table": table,
                 "is_successful": True,
-                "have_solution": False,
-                "solution": formatted_x1,
+                "have_solution": True if table else False,
+                "solution": [float(x) for x in formatted_x1] if table else [],
                 "spectral_radius": spectral_radius,
             }
         else:
@@ -88,10 +97,11 @@ class JacobiService(MatrixMethod):
                 "solution": [],
             }
 
-        # Si la matriz es 2x2, generar la gráfica
+        # Generar gráficas si la matriz es 2x2 (independientemente de convergencia)
         if len(A) == 2:
-            plot_matrix_solution(table, x1.tolist(), spectral_radius)
-            plot_system_equations(A.tolist(), b.tolist(), x1.tolist())
+            # Usa la última solución calculada (x1 o formatted_x1)
+            plot_matrix_solution(table, formatted_x1, spectral_radius)
+            plot_system_equations(A.tolist(), b.tolist(), formatted_x1)
 
         return result
 

@@ -1,4 +1,4 @@
-    {% extends 'layouts/app.html' %}
+{% extends 'layouts/app.html' %}
     {% load static %}
 
     {% block extra_css %}
@@ -64,37 +64,45 @@
         {% if template_data %}
             {% include 'components/alert_message.html' with message=template_data.message_method title='Información proporcionada por el método' %}
             {% if template_data.is_successful %}
-            {% include 'components/result_tables/result_table_SNSE.html' %}
-            {% if template_data.spectral_radius < 1 %}
-            <p class="text-success text-center mt-4">El método converge debido a que el radio espectral es menor que 1.</p>
-            {% else %}
-            <p class="text-danger text-center mt-4">El método no converge debido a que el radio espectral es mayor o igual a 1.</p>
-            {% endif %}
+                {% include 'components/result_tables/result_table_SNSE.html' %}
+                {% if template_data.spectral_radius < 1 %}
+                    <p class="text-success text-center mt-4">El método converge debido a que el radio espectral es menor que 1.</p>
+                {% else %}
+                    <p class="text-danger text-center mt-4">El método no converge debido a que el radio espectral es mayor o igual a 1.</p>
+                {% endif %}
 
-            <!-- Mostrar las gráficas si es una matriz 2x2 -->
-            {% if template_data.solution|length == 2 %}
-            <div class="container d-flex justify-content-center mt-4">
-                <h5 class="text-center">Gráfica de la solución iterativa</h5>
-                <img src="{% static 'img/numerical_method/matrix_solution_plot.svg' %}" alt="Gráfica de la solución iterativa" class="img-fluid" width="800px" />
-            </div>
-            <div class="container d-flex justify-content-center mt-4">
-                <h5 class="text-center">Gráfica del sistema (2x2)</h5>
-                <img src="{% static 'img/numerical_method/system_plot.svg' %}" alt="Gráfica del sistema" class="img-fluid" width="800px" />
-            </div>
-            <!-- Botón para descargar la gráfica de la solución iterativa -->
-            <div class="container d-flex justify-content-center mt-3">
-                <a href="{% static 'img/numerical_method/matrix_solution_plot.svg' %}" class="btn btn-dark mx-2" download="matrix_solution_plot.svg">
-                Descargar gráfica iterativa (SVG)
-                </a>
-            </div>
+                <!-- Mostrar las gráficas solo si es una matriz 2x2 -->
+                {% if template_data.solution|length == 2 %}
+                <div class="container d-flex justify-content-center mt-4">
+                    <h5 class="text-center">Gráfica de la solución iterativa</h5>
+                    <img src="{% static 'img/numerical_method/matrix_solution_plot.svg' %}" alt="Gráfica de la solución iterativa" class="img-fluid" width="800px" />
+                </div>
+                <div class="container d-flex justify-content-center mt-4">
+                    <h5 class="text-center">Gráfica del sistema (2x2)</h5>
+                    <img src="{% static 'img/numerical_method/system_plot.svg' %}" alt="Gráfica del sistema" class="img-fluid" width="800px" />
+                </div>
+                {% endif %}
 
-            <!-- Botón para descargar la gráfica del sistema de ecuaciones -->
-            <div class="container d-flex justify-content-center mt-3">
-                <a href="{% static 'img/numerical_method/system_plot.svg' %}" class="btn btn-dark mx-2" download="system_plot.svg">
-                Descargar gráfica del sistema (SVG)
-                </a>
-            </div>
-            {% endif %}
+                <!-- Botón para descargar la gráfica de la solución iterativa y el informe comparativo CSV -->
+                <div class="container d-flex justify-content-center mt-3">
+                    {% if template_data.solution|length == 2 %}
+                    <a href="{% static 'img/numerical_method/matrix_solution_plot.svg' %}" class="btn btn-dark mx-2" download="matrix_solution_plot.svg">
+                        Descargar gráfica iterativa (SVG)
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'numerical_method:download_matrix_comparison_csv' %}?matrix_a={{ request.POST.matrix_a|urlencode }}&vector_b={{ request.POST.vector_b|urlencode }}&initial_guess={{ request.POST.initial_guess|urlencode }}&tolerance={{ request.POST.tolerance }}&max_iterations={{ request.POST.max_iterations }}&precision_type={% if request.POST.precision == '1' %}decimales_correctos{% else %}cifras_significativas{% endif %}&matrix_size={{ request.POST.matrix_size }}" class="btn btn-success mx-2" download="comparacion_metodos.csv">
+                        Descargar informe comparativo (CSV)
+                    </a>
+                </div>
+
+                <!-- Botón para descargar la gráfica del sistema de ecuaciones (solo 2x2) -->
+                {% if template_data.solution|length == 2 %}
+                <div class="container d-flex justify-content-center mt-3">
+                    <a href="{% static 'img/numerical_method/system_plot.svg' %}" class="btn btn-dark mx-2" download="system_plot.svg">
+                        Descargar gráfica del sistema (SVG)
+                    </a>
+                </div>
+                {% endif %}
             {% endif %}
         {% endif %}
         </div>

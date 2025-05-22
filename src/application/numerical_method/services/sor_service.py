@@ -49,18 +49,28 @@ class SORService(MatrixMethod):
             # Aplicar precisión al vector de soluciones y al error
             if precision_type == 1:  # Decimales correctos
                 x_new = np.round(x_new, int(-np.floor(np.log10(tolerance))))
-                current_error = round(current_error, int(-np.floor(np.log10(tolerance))))
+                current_error_rounded = round(current_error, int(-np.floor(np.log10(tolerance))))
             elif precision_type == 0:  # Cifras significativas
                 factor = 10 ** int(np.ceil(np.log10(abs(1 / tolerance))))
                 x_new = np.round(x_new * factor) / factor
-                current_error = round(current_error * factor) / factor
+                current_error_rounded = round(current_error * factor) / factor
+            else:
+                current_error_rounded = current_error
 
-            # Guardar información en la tabla para la iteración actual
-            table[current_iteration + 1] = {
-                "iteration": current_iteration + 1,
-                "X": x_new.tolist(),
-                "Error": current_error,
-            }
+            # Guardar la fila SOLO si current_error > tolerance o si es la última iteración
+            if current_error > tolerance or current_iteration + 1 == max_iterations:
+                table[current_iteration + 1] = {
+                    "iteration": current_iteration + 1,
+                    "X": x_new.tolist(),
+                    "Error": current_error_rounded,
+                }
+            else:
+                table[current_iteration + 1] = {
+                    "iteration": current_iteration + 1,
+                    "X": x_new.tolist(),
+                    "Error": current_error_rounded,
+                }
+                break
 
             # Preparar para la siguiente iteración
             x = x_new
@@ -74,16 +84,16 @@ class SORService(MatrixMethod):
                 "table": table,
                 "is_successful": True,
                 "have_solution": True,
-                "solution": x.tolist(),
+                "solution": [float(x) for x in x.tolist()],
                 "spectral_radius": spectral_radius,
             }
         elif current_iteration >= max_iterations:
             result = {
-                "message_method": f"El método funcionó correctamente, pero no se encontró una solución en {max_iterations} iteraciones y el radio espectral es de = {spectral_radius}.",
+                "message_method": f"El método llegó al máximo de iteraciones ({max_iterations}) y el radio espectral es de = {spectral_radius}. Se muestra la mejor aproximación encontrada.",
                 "table": table,
                 "is_successful": True,
-                "have_solution": False,
-                "solution": x.tolist(),
+                "have_solution": True if table else False,
+                "solution": [float(x) for x in x.tolist()] if table else [],
                 "spectral_radius": spectral_radius,
             }
         else:
@@ -96,7 +106,7 @@ class SORService(MatrixMethod):
                 "spectral_radius": spectral_radius,
             }
 
-        # Si la matriz es 2x2, generar las gráficas
+        # Generar gráficas si la matriz es 2x2 (independientemente de convergencia)
         if len(A) == 2:
             plot_matrix_solution(table, x.tolist(), spectral_radius)
             plot_system_equations(A.tolist(), b.tolist(), x.tolist())

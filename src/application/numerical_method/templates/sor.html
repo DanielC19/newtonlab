@@ -85,14 +85,21 @@
             <h5 class="text-center">Gráfica del sistema (2x2)</h5>
             <img src="{% static 'img/numerical_method/system_plot.svg' %}" alt="Gráfica del sistema" class="img-fluid" width="800px" />
           </div>
-          <!-- Botón para descargar la gráfica de la solución iterativa -->
+          {% endif %}
+
+          <!-- Botón para descargar la gráfica y el CSV -->
           <div class="container d-flex justify-content-center mt-3">
+            {% if template_data.solution|length == 2 %}
             <a href="{% static 'img/numerical_method/matrix_solution_plot.svg' %}" class="btn btn-dark mx-2" download="matrix_solution_plot.svg">
               Descargar gráfica iterativa (SVG)
             </a>
+            {% endif %}
+            <a href="{% url 'numerical_method:download_matrix_comparison_csv' %}?matrix_a={{ request.POST.matrix_a|urlencode }}&vector_b={{ request.POST.vector_b|urlencode }}&initial_guess={{ request.POST.initial_guess|urlencode }}&tolerance={{ request.POST.tolerance }}&max_iterations={{ request.POST.max_iterations }}&relaxation_factor={{ request.POST.relaxation_factor }}&precision_type={% if request.POST.precision == '1' %}decimales_correctos{% else %}cifras_significativas{% endif %}&matrix_size={{ request.POST.matrix_size }}" class="btn btn-success mx-2" download="comparacion_metodos.csv">
+              Descargar informe comparativo (CSV)
+            </a>
           </div>
-
-          <!-- Botón para descargar la gráfica del sistema de ecuaciones -->
+          <!-- Botón para descargar la gráfica del sistema de ecuaciones (solo 2x2) -->
+          {% if template_data.solution|length == 2 %}
           <div class="container d-flex justify-content-center mt-3">
             <a href="{% static 'img/numerical_method/system_plot.svg' %}" class="btn btn-dark mx-2" download="system_plot.svg">
               Descargar gráfica del sistema (SVG)

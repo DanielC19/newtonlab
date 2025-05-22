@@ -8,6 +8,9 @@ from src.application.numerical_method.services.newton_raphson_service import New
 from src.application.numerical_method.services.secant_service import SecantService
 from src.application.numerical_method.services.multiple_roots_1_service import MultipleRoots1Service
 from src.application.numerical_method.services.multiple_roots_2_service import MultipleRoots2Service
+from src.application.numerical_method.services.jacobi_service import JacobiService
+from src.application.numerical_method.services.gauss_seidel_service import GaussSeidelService
+from src.application.numerical_method.services.sor_service import SORService
 
 def run_all_methods(params):
     # Estandarizar parámetros para todos los métodos
@@ -155,3 +158,79 @@ def run_all_methods(params):
         row.pop("¿Mejor?", None)
         writer.writerow(row)
     return output.getvalue()
+
+def compare_matrix_methods_report(A, b, x0, tolerance, max_iterations, relaxation_factor=1.2, precision_type="decimales_correctos"):
+    """
+    Compara Jacobi, Gauss-Seidel y SOR para el mismo sistema.
+    Devuelve el CSV y los datos tabulares.
+    """
+    results = []
+
+    # Jacobi
+    try:
+        jacobi_res = JacobiService().solve(
+            A, b, x0, tolerance, max_iterations, precision_type
+        )
+        have_solution = jacobi_res.get("have_solution")
+        table = jacobi_res.get("table", {})
+        last_iter = table[max(table)] if table else {}
+        error_value = last_iter.get("Error", "-") if have_solution else "-"
+        results.append({
+            "Método": "Jacobi",
+            "Iteraciones": len(table),
+            "Solución": jacobi_res.get("solution", []) if have_solution else "-",
+            "Error": error_value,
+            "¿Converge?": "Sí" if have_solution else "No"
+        })
+    except Exception:
+        results.append({"Método": "Jacobi", "Iteraciones": "-", "Solución": "-", "Error": "-", "¿Converge?": "No"})
+
+    # Gauss-Seidel
+    try:
+        gs_precision = 1 if precision_type == "decimales_correctos" else 0
+        gs_res = GaussSeidelService().solve(
+            A, b, x0, tolerance, max_iterations, gs_precision
+        )
+        have_solution = gs_res.get("have_solution")
+        table = gs_res.get("table", {})
+        last_iter = table[max(table)] if table else {}
+        error_value = last_iter.get("Error", "-") if have_solution else "-"
+        results.append({
+            "Método": "Gauss-Seidel",
+            "Iteraciones": len(table),
+            "Solución": gs_res.get("solution", []) if have_solution else "-",
+            "Error": error_value,
+            "¿Converge?": "Sí" if have_solution else "No"
+        })
+    except Exception:
+        results.append({"Método": "Gauss-Seidel", "Iteraciones": "-", "Solución": "-", "Error": "-", "¿Converge?": "No"})
+
+    # SOR
+    try:
+        sor_precision = 1 if precision_type == "decimales_correctos" else 0
+        sor_res = SORService().solve(
+            A, b, x0, tolerance, max_iterations, relaxation_factor, sor_precision
+        )
+        have_solution = sor_res.get("have_solution")
+        table = sor_res.get("table", {})
+        last_iter = table[max(table)] if table else {}
+        error_value = last_iter.get("Error", "-") if have_solution else "-"
+        results.append({
+            "Método": "SOR",
+            "Iteraciones": len(table),
+            "Solución": sor_res.get("solution", []) if have_solution else "-",
+            "Error": error_value,
+            "¿Converge?": "Sí" if have_solution else "No"
+        })
+    except Exception:
+        results.append({"Método": "SOR", "Iteraciones": "-", "Solución": "-", "Error": "-", "¿Converge?": "No"})
+
+    # Generar CSV en memoria
+    output = io.StringIO()
+    writer = csv.DictWriter(output, fieldnames=["Método", "Iteraciones", "Solución", "Error", "¿Converge?"])
+    writer.writeheader()
+    for row in results:
+        writer.writerow(row)
+    csv_content = output.getvalue()
+
+    return csv_content, results
