@@ -8,6 +8,7 @@ from src.application.numerical_method.containers.numerical_method_container impo
 from dependency_injector.wiring import inject, Provide
 from src.application.shared.utils.plot_function import plot_function
 from django.http import HttpRequest, HttpResponse
+from src.application.numerical_method.utils.method_comparison import run_all_methods
 
 
 class BisectionView(TemplateView):
@@ -82,6 +83,21 @@ class BisectionView(TemplateView):
                 method_response["have_solution"],
                 [(method_response["root"], 0.0)],
             )
+
+        if request.POST.get("generate_report") == "1":
+            params = {
+                "interval_a": interval_a,
+                "interval_b": interval_b,
+                "x0": interval_a,
+                "tolerance": tolerance,
+                "max_iterations": max_iterations,
+                "function_f": function_f,
+                "precision": precision,
+            }
+            csv_content = run_all_methods(params)
+            response = HttpResponse(csv_content, content_type="text/csv")
+            response["Content-Disposition"] = "attachment; filename=comparacion_metodos.csv"
+            return response
 
         template_data = template_data | method_response
         context["template_data"] = template_data

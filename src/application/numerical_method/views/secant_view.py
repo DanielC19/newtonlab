@@ -7,6 +7,7 @@ from src.application.numerical_method.containers.numerical_method_container impo
 )
 from dependency_injector.wiring import inject, Provide
 from src.application.shared.utils.plot_function import plot_function
+from src.application.numerical_method.utils.method_comparison import run_all_methods
 from django.http import HttpRequest, HttpResponse
 
 
@@ -81,4 +82,20 @@ class SecantView(TemplateView):
             )
         template_data = template_data | method_response
         context["template_data"] = template_data
+
+        if request.POST.get("generate_report") == "1":
+            params = {
+                "interval_a": float(request.POST.get("interval_a")),
+                "interval_b": float(request.POST.get("interval_b")),
+                "x0": float(request.POST.get("interval_a")),
+                "tolerance": float(request.POST.get("tolerance")),
+                "max_iterations": int(request.POST.get("max_iterations")),
+                "function_f": request.POST.get("function_f"),
+                "precision": int(request.POST.get("precision")),
+            }
+            csv_content = run_all_methods(params)
+            response = HttpResponse(csv_content, content_type="text/csv")
+            response["Content-Disposition"] = "attachment; filename=comparacion_metodos.csv"
+            return response
+
         return self.render_to_response(context)

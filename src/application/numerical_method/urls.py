@@ -15,6 +15,7 @@ from .views.spline_linear_view import SplineLinearView
 from .views.spline_cubic_view import SplineCubicView
 from .views.lagrange_view import LagrangeView
 from .views.newton_interpol_view import NewtonInterpolView
+from src.application.numerical_method.views.download_csv_report_view import DownloadCSVReportView
 
 app_name = "numerical_method"
 urlpatterns = [
@@ -97,5 +98,10 @@ urlpatterns = [
         "newton-interpol/",
         NewtonInterpolView.as_view(),
         name="newton-interpol",
+    ),
+    path(
+        "download_csv_report/",
+        DownloadCSVReportView.as_view(),
+        name="download_csv_report",
     ),
 ]

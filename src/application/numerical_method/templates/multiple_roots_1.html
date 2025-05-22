@@ -57,7 +57,18 @@
           <div class="container d-flex justify-content-center">
             <img src="{% static 'img/numerical_method/function_plot.svg' %}" alt="Gráfica de la función" class="img-fluid" width="800px" />
           </div>
-          {% include 'components/download_svg_button.html' %}
+          <div class="container d-flex justify-content-center mt-3">
+            <a href="{% url 'numerical_method:download_svg' %}" class="btn btn-dark mx-2">
+              Descargar SVG
+            </a>
+            <a
+              href="{% url 'numerical_method:download_csv_report' %}?x0={{ request.POST.x0 }}&tolerance={{ request.POST.tolerance }}&max_iterations={{ request.POST.max_iterations }}&function_f={{ request.POST.function_f|urlencode }}&precision={{ request.POST.precision }}&multiplicity={{ request.POST.multiplicity }}"
+              class="btn btn-dark mx-2"
+              download="comparacion_metodos.csv"
+            >
+              Descargar informe comparativo (CSV)
+            </a>
+          </div>
         {% endif %}
       {% endif %}
     </div>
