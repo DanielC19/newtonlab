@@ -1,0 +1,21 @@
+<div class="container d-flex justify-content-center mt-3">
+  <form method="post" action="{% url 'numerical_method:descargar_informe_interpolacion' %}" class="d-inline">
+    {% csrf_token %}
+    <input type="hidden" name="x" value="{{ x }}">
+    <input type="hidden" name="y" value="{{ y }}">
+    <div class="input-group">
+      <select name="file_format" class="form-select w-auto" style="max-width:120px;">
+        <option value="csv">CSV</option>
+        <option value="pdf" disabled>PDF (próximamente)</option>
+      </select>
+      <button type="submit" class="btn btn-success ms-2">
+        <i class="bi bi-download"></i> Descargar informe de todos los métodos
+      </button>
+    </div>
+  </form>
+</div>
+<style>
+  .btn-success i {
+    margin-right: 6px;
+  }
+</style>

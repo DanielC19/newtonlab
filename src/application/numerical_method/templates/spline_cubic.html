@@ -1,4 +1,4 @@
-    {% extends 'layouts/app.html' %}
+{% extends 'layouts/app.html' %}
     {% load static %}
 
     {% block extra_css %}
@@ -70,6 +70,7 @@
                 Descargar SVG
             </a>
             </div>
+            {% include 'components/download_report_button.html' with x=request.POST.x y=request.POST.y %}
         {% endif %}
         {% endif %}
     </div>

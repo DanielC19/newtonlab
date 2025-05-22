@@ -1,4 +1,4 @@
-    {% extends 'layouts/app.html' %}
+{% extends 'layouts/app.html' %}
     {% load static %}
 
     {% block extra_css %}
@@ -71,7 +71,8 @@
                 <a href="{% static 'img/numerical_method/spline_linear_plot.svg' %}" class="btn btn-dark" download="spline_cubic_plot.svg">
                     Descargar SVG
                 </a>
-                </div>
+            </div>
+            {% include 'components/download_report_button.html' with x=request.POST.x y=request.POST.y %}
             {% endif %}
         {% endif %}
         </div>

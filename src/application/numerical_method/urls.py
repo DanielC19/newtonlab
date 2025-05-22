@@ -17,6 +17,7 @@ from .views.lagrange_view import LagrangeView
 from .views.newton_interpol_view import NewtonInterpolView
 from src.application.numerical_method.views.download_csv_report_view import DownloadCSVReportView
 from .views.matrix_comparison_report_view import MatrixComparisonReportView
+from src.application.numerical_method.views.interpolation_report_view import InterpolationReportView
 
 app_name = "numerical_method"
 urlpatterns = [
@@ -109,5 +110,10 @@ urlpatterns = [
         "download_matrix_comparison_csv/",
         MatrixComparisonReportView.as_view(),
         name="download_matrix_comparison_csv",
+    ),
+    path(
+        "descargar-informe-interpolacion/",
+        InterpolationReportView.as_view(),
+        name="descargar_informe_interpolacion",
     ),
 ]
