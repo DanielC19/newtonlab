@@ -133,29 +133,77 @@ def run_all_methods(params):
     except Exception:
         results.append({"Método": "Raíces Múltiples #2", "Iteraciones": "-", "Solución": "-", "¿Converge?": "No"})
 
-    # Filtrar los que convergen
-    converged = [r for r in results if r.get('¿Converge?') == 'Sí' and isinstance(r.get('Iteraciones'), int)]
-    # Encontrar el mínimo de iteraciones
-    best = None
-    if converged:
-        min_iter = min(r['Iteraciones'] for r in converged)
-        # Si hay empate, puedes marcar todos como "Sí" o solo el primero
-        for r in results:
-            if r.get('¿Converge?') == 'Sí' and r.get('Iteraciones') == min_iter:
-                r['¿Mejor?'] = 'Sí'
-            else:
-                r['¿Mejor?'] = 'No'
+    # Filtrar solo los métodos convergentes y tienen solución numérica válida
+    converged = [
+        r for r in results
+        if r.get('¿Converge?', r.get('¿Éxito?', False)) in ('Sí', True)
+        and r.get('Solución', r.get('Raíz', None)) not in ("-", "", None)
+    ]
+
+    # Si hay al menos dos métodos convergentes, buscar los más parecidos
+    best_indexes = []
+    if len(converged) >= 2:
+        # Extraer soluciones numéricas
+        def parse_solution(sol):
+            # Puede ser lista, float, o string
+            if isinstance(sol, list):
+                return [float(x) for x in sol]
+            try:
+                return [float(sol)]
+            except Exception:
+                # Intentar parsear string tipo "[1.0, 2.0]"
+                try:
+                    import ast
+                    val = ast.literal_eval(sol)
+                    if isinstance(val, (list, tuple)):
+                        return [float(x) for x in val]
+                    return [float(val)]
+                except Exception:
+                    return []
+        parsed = [(i, parse_solution(r.get('Solución', r.get('Raíz', None)))) for i, r in enumerate(converged)]
+        # Calcular distancia euclidiana entre todas las combinaciones
+        import itertools
+        min_dist = float('inf')
+        best_pair = None
+        for (i1, s1), (i2, s2) in itertools.combinations(parsed, 2):
+            if len(s1) == len(s2) and len(s1) > 0:
+                dist = sum((a - b) ** 2 for a, b in zip(s1, s2)) ** 0.5
+                if dist < min_dist:
+                    min_dist = dist
+                    best_pair = (i1, i2)
+        # Seleccionar los dos más parecidos
+        if best_pair:
+            best_indexes = list(best_pair)
+    elif len(converged) == 1:
+        best_indexes = [0]
+
+    # De los más parecidos, elegir el de menos iteraciones
+    if best_indexes:
+        min_iter = float('inf')
+        best_idx = None
+        for idx in best_indexes:
+            iteraciones = converged[idx].get('Iteraciones', float('inf'))
+            try:
+                iteraciones = int(iteraciones)
+            except Exception:
+                iteraciones = float('inf')
+            if iteraciones < min_iter:
+                min_iter = iteraciones
+                best_idx = idx
+        # Marcar el mejor método
+        for i, r in enumerate(results):
+            r['¿Mejor?'] = "Sí" if r in converged and converged.index(r) == best_idx else "No"
     else:
         for r in results:
-            r['¿Mejor?'] = 'No'
+            r['¿Mejor?'] = "No"
 
-    # Generar CSV en memoria (sin la columna ¿Mejor?)
+    # Generar CSV en memoria (incluyendo columna ¿Mejor?)
     output = io.StringIO()
-    writer = csv.DictWriter(output, fieldnames=["Método", "Iteraciones", "Solución", "¿Converge?"])
+    # Detectar campos automáticamente
+    fieldnames = list(results[0].keys()) if results else []
+    writer = csv.DictWriter(output, fieldnames=fieldnames)
     writer.writeheader()
     for row in results:
-        # Elimina la clave ¿Mejor? si existe
-        row.pop("¿Mejor?", None)
         writer.writerow(row)
     return output.getvalue()
 
@@ -225,9 +273,73 @@ def compare_matrix_methods_report(A, b, x0, tolerance, max_iterations, relaxatio
     except Exception:
         results.append({"Método": "SOR", "Iteraciones": "-", "Solución": "-", "Error": "-", "¿Converge?": "No"})
 
+    # Selección del mejor método: compara soluciones, elige los más parecidos y de esos el de menor error final (si empate, menor iteraciones)
+    converged = [r for r in results if r.get("¿Converge?") == "Sí" and r.get("Solución") not in ("-", "", None)]
+    best_indexes = []
+    if len(converged) >= 2:
+        # Parsear soluciones a listas de floats
+        def parse_solution(sol):
+            if isinstance(sol, list):
+                return [float(x) for x in sol]
+            try:
+                return [float(sol)]
+            except Exception:
+                try:
+                    import ast
+                    val = ast.literal_eval(sol)
+                    if isinstance(val, (list, tuple)):
+                        return [float(x) for x in val]
+                    return [float(val)]
+                except Exception:
+                    return []
+        parsed = [(i, parse_solution(r.get("Solución"))) for i, r in enumerate(converged)]
+        import itertools
+        min_dist = float("inf")
+        best_pair = None
+        for (i1, s1), (i2, s2) in itertools.combinations(parsed, 2):
+            if len(s1) == len(s2) and len(s1) > 0:
+                dist = sum((a - b) ** 2 for a, b in zip(s1, s2)) ** 0.5
+                if dist < min_dist:
+                    min_dist = dist
+                    best_pair = (i1, i2)
+        if best_pair:
+            best_indexes = list(best_pair)
+    elif len(converged) == 1:
+        best_indexes = [0]
+
+    # De los más parecidos, elegir el de menor error final (si empate, menor iteraciones)
+    if best_indexes:
+        min_error = float("inf")
+        best_idx = None
+        for idx in best_indexes:
+            r = converged[idx]
+            try:
+                error = float(r.get("Error", float("inf")))
+            except Exception:
+                error = float("inf")
+            if error < min_error:
+                min_error = error
+                best_idx = idx
+        # Si hay empate en error, elegir menor iteraciones
+        if best_idx is not None:
+            bests = [idx for idx in best_indexes if
+                     abs(float(converged[idx].get("Error", float("inf"))) - min_error) < 1e-12]
+            if len(bests) > 1:
+                min_iter = min(int(converged[idx].get("Iteraciones", float("inf"))) for idx in bests)
+                best_idx = [idx for idx in bests if int(converged[idx].get("Iteraciones", float("inf"))) == min_iter][0]
+            best = converged[best_idx]
+            for r in results:
+                r["¿Mejor?"] = "Sí" if r is best else "No"
+        else:
+            for r in results:
+                r["¿Mejor?"] = "No"
+    else:
+        for r in results:
+            r["¿Mejor?"] = "No"
+
     # Generar CSV en memoria
     output = io.StringIO()
-    writer = csv.DictWriter(output, fieldnames=["Método", "Iteraciones", "Solución", "Error", "¿Converge?"])
+    writer = csv.DictWriter(output, fieldnames=["Método", "Iteraciones", "Solución", "Error", "¿Converge?", "¿Mejor?"])
     writer.writeheader()
     for row in results:
         writer.writerow(row)
