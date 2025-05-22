@@ -102,3 +102,37 @@ def plot_spline_cubic(title: str, points: list[tuple[float, float]], x_values, y
     # Guardar la gráfica
     plt.savefig(output_file, format="svg")
     plt.close()
+
+
+def plot_spline_quadratic(title: str, points: list[tuple[float, float]], x_values, y_values):
+    import matplotlib.pyplot as plt
+
+    output_file = BASE_DIR / "static/img/numerical_method/spline_quadratic_plot.svg"
+    plt.figure(figsize=(8, 6))
+    x_sorted = np.array(sorted(x_values))
+    n = len(x_sorted)
+    # Calcular los tramos cuadráticos
+    for i in range(n - 1):
+        xi, xi1 = x_sorted[i], x_sorted[i + 1]
+        yi, yi1 = y_values[i], y_values[i + 1]
+        # Interpolación cuadrática simple por tramos (para visualización)
+        x_tramo = np.linspace(xi, xi1, 100)
+        # Ajuste cuadrático usando los 3 puntos más cercanos
+        idxs = [max(0, i - 1), i, min(n - 1, i + 1)]
+        px = [x_sorted[j] for j in idxs]
+        py = [y_values[j] for j in idxs]
+        coef = np.polyfit(px, py, 2)
+        y_tramo = np.polyval(coef, x_tramo)
+        plt.plot(x_tramo, y_tramo, color="#8e44ad", linewidth=2)
+    for x, y in points:
+        plt.scatter(x, y, color="#f7dc6f", zorder=5)
+        plt.text(x, y, f"({x:.1f}, {y:.1f})", fontsize=9, verticalalignment="bottom")
+    plt.title(title)
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.axhline(0, color="black", linewidth=0.5, linestyle="--")
+    plt.axvline(0, color="black", linewidth=0.5, linestyle="--")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig(output_file, format="svg")
+    plt.close()

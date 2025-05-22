@@ -130,7 +130,7 @@
         </div>
         <div class="col">
           <a class="card no-border" href="{% url 'numerical_method:newton-interpol' %}">
-            <img src="{% static 'img/home/methods-icon.jpeg' %}" class="card-img-top" alt="Vandermonde" />
+            <img src="{% static 'img/home/methods-icon.jpeg' %}" class="card-img-top" alt="Newton" />
             <div class="card-body">
               <p class="card-text text-center">Método de Newton</p>
             </div>
@@ -140,7 +140,7 @@
           <a class="card no-border" href="{% url 'numerical_method:lagrange' %}">
             <img src="{% static 'img/home/methods-icon.jpeg' %}" class="card-img-top" alt="Lagrange" />
             <div class="card-body">
-              <p class="card-text text-center">Método de lagrange</p>
+              <p class="card-text text-center">Método de Lagrange</p>
             </div>
           </a>
         </div>
@@ -153,16 +153,21 @@
           </a>
         </div>
         <div class="col">
-          <a class="card no-border" href="{% url 'numerical_method:spline_cubic' %}">
-            <img src="{% static 'img/home/methods-icon.jpeg' %}" class="card-img-top" alt="Spline Cubico" />
+          <a class="card no-border" href="{% url 'numerical_method:spline_quadratic' %}">
+            <img src="{% static 'img/home/methods-icon.jpeg' %}" class="card-img-top" alt="Spline Cuadrático" />
             <div class="card-body">
-              <p class="card-text text-center">Método de Spline Cubico</p>
+              <p class="card-text text-center">Método de Spline Cuadrático</p>
             </div>
           </a>
         </div>
         <div class="col">
-          <div class="card no-border"></div>
-        <div class="col"></div>
+          <a class="card no-border" href="{% url 'numerical_method:spline_cubic' %}">
+            <img src="{% static 'img/home/methods-icon.jpeg' %}" class="card-img-top" alt="Spline Cúbico" />
+            <div class="card-body">
+              <p class="card-text text-center">Método de Spline Cúbico</p>
+            </div>
+          </a>
+        </div>
       </div>
     </div>
   </section>

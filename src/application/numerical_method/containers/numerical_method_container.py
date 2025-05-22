@@ -44,6 +44,7 @@ from src.application.numerical_method.services.lagrange_service import (
 from src.application.numerical_method.services.newton_interpol_service import (
   NewtonInterpolService,
 )
+from src.application.numerical_method.services.spline_quadratic_service import SplineQuadraticService
 
 
 class NumericalMethodContainer(containers.DeclarativeContainer):
@@ -62,3 +63,4 @@ class NumericalMethodContainer(containers.DeclarativeContainer):
     spline_cubic_service = providers.Factory(SplineCubicService)
     lagrange_service = providers.Factory(LagrangeService)
     newton_interpol_service = providers.Factory(NewtonInterpolService)
+    spline_quadratic_service = providers.Singleton(SplineQuadraticService)

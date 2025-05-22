@@ -7,6 +7,7 @@ from src.application.numerical_method.services.vandermonde_service import Vander
 from src.application.numerical_method.services.newton_interpol_service import NewtonInterpolService
 from src.application.numerical_method.services.spline_linear_service import SplineLinearService
 from src.application.numerical_method.services.spline_cubic_service import SplineCubicService
+from src.application.numerical_method.services.spline_quadratic_service import SplineQuadraticService
 
 class InterpolationReportView(View):
     def post(self, request, *args, **kwargs):
@@ -20,6 +21,7 @@ class InterpolationReportView(View):
             ("Vandermonde", VandermondeService()),
             ("Newton", NewtonInterpolService()),
             ("Spline Lineal", SplineLinearService()),
+            ("Spline Cuadrático", SplineQuadraticService()),
             ("Spline Cúbico", SplineCubicService()),
         ]
         results = []
@@ -30,12 +32,12 @@ class InterpolationReportView(View):
             else:
                 x, y = valid
                 response = service.solve(x, y)
-                if name in ["Spline Lineal", "Spline Cúbico"]:
+                if name in ["Spline Lineal", "Spline Cuadrático", "Spline Cúbico"]:
                     if response.get("is_successful"):
                         tramos = response.get("tramos", [])
-                        result = "\n".join([f"Tramo {i+1}: {t}" for i, t in enumerate(tramos)]) if tramos else response.get("message_method")
+                        result = "\n".join(tramos) if tramos else ""
                     else:
-                        result = response.get("message_method")
+                        result = response.get("message_method", "")
                 else:
                     result = response.get("polynomial") or response.get("message_method")
             results.append((name, result))

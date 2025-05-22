@@ -18,6 +18,7 @@ from .views.newton_interpol_view import NewtonInterpolView
 from src.application.numerical_method.views.download_csv_report_view import DownloadCSVReportView
 from .views.matrix_comparison_report_view import MatrixComparisonReportView
 from src.application.numerical_method.views.interpolation_report_view import InterpolationReportView
+from src.application.numerical_method.views.spline_quadratic_view import SplineQuadraticView
 
 app_name = "numerical_method"
 urlpatterns = [
@@ -115,5 +116,10 @@ urlpatterns = [
         "descargar-informe-interpolacion/",
         InterpolationReportView.as_view(),
         name="descargar_informe_interpolacion",
+    ),
+    path(
+        "spline-quadratic/",
+        SplineQuadraticView.as_view(),
+        name="spline_quadratic",
     ),
 ]
