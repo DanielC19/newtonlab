@@ -44,10 +44,11 @@ class GaussSeidelService(MatrixMethod):
 
             # Aplicar precisión según el tipo seleccionado
             if precision == 1:  # Decimales correctos
-                x1_rounded = [round(value, len(str(tolerance).split(".")[1])) for value in x1]
-                error_rounded = round(current_error, len(str(tolerance).split(".")[1]))
+                decimal_places = abs(int(format(tolerance, 'e').split('e')[1]))
+                x1_rounded = [round(value, decimal_places) for value in x1]
+                error_rounded = round(current_error, decimal_places)
             elif precision == 0:  # Cifras significativas
-                significant_digits = len(str(tolerance).replace("0.", ""))
+                significant_digits = len(format(tolerance, 'e').split('e')[0].replace('.', '').rstrip('0'))
                 x1_rounded = [float(f"{value:.{significant_digits}g}") for value in x1]
                 error_rounded = float(f"{current_error:.{significant_digits}g}")
 
