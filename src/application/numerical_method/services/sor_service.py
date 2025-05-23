@@ -150,9 +150,9 @@ class SORService(MatrixMethod):
         if len(A) != matrix_size or any(len(row) != matrix_size for row in A):
             return f"La matriz A debe ser cuadrada y coincidir con el tamaño seleccionado ({matrix_size}x{matrix_size})."
 
-        # Validar que A es de máximo tamaño 6x6
-        if len(A) > 6:
-            return "La matriz A debe ser de hasta 6x6."
+        # Validar que A es de máximo tamaño 7x7
+        if len(A) > 7:
+            return "La matriz A debe ser de hasta 7x7."
 
         # Validar que b y x0 tengan tamaños compatibles con A
         if len(b) != len(A) or len(x0) != len(A):

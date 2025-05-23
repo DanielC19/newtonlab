@@ -22,7 +22,7 @@
           <div class="form-group">
             <label for="matrix_size">Seleccione el tamaño de la matriz:</label>
             <select class="form-control" id="matrix_size" name="matrix_size" required>
-              {% for i in matrix_sizes %}
+              {% for i in '234567'|make_list %}
               <option value="{{ i }}">{{ i }}x{{ i }}</option>
               {% endfor %}
             </select>
