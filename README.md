@@ -20,7 +20,7 @@ Los métodos que nuestra aplicación resuelve son:
 - Método de Vandermonde
 - Método de Interpolación de Newton
 - Método de Lagrange
-- Métodos de Spline Lineal y Cúbico
+- Métodos de Spline Lineal, Cuadrático y Cúbico
 
 ## Requisitos previos
 - Python 3.x instalado.
